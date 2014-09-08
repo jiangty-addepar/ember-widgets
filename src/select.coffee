@@ -214,11 +214,27 @@ Ember.AddeparMixins.ResizeHandlerMixin,
       @get('content').filter (item) => @matcher(query, item)
     )
     return filteredContent unless @get('sortLabels')
+
+    # TODO(chris): look at how to factor this to use the labels array
+    # We need to call @get 'labels' because otherwise the contenProxy is
+    # never initialized and we are not able to watch labels.@each
+    labels  = @get 'labels'
     Ember.A(
       _.sortBy filteredContent, (item) =>
         get(item, @get('optionLabelPath'))?.toLowerCase()
     )
-  .property 'content.@each', 'query', 'optionLabelPath', 'sortLabels'
+  .property 'content.@each', 'query', 'optionLabelPath', 'sortLabels', 'labels.@each'
+
+  contentProxy: Ember.computed ->
+    # TODO(chris): review & find a way to use ArrayProxy
+    ContentProxy = Ember.ObjectProxy.extend
+      labels: Ember.computed.mapBy 'content', @get('optionLabelPath')
+
+    ContentProxy.create
+      content: @get('content')
+  .property 'content', 'optionLabelPath'
+
+  labels: Ember.computed.alias 'contentProxy.labels'
 
   # the list of content that is grouped by the content in the optionGroupPath
   # e.g. {name: 'Addepar', location: 'Mountain View'}
@@ -237,7 +253,7 @@ Ember.AddeparMixins.ResizeHandlerMixin,
       result.pushObject  Ember.Object.create isGroupOption: yes, name:key
       result.pushObjects groups[key]
     result
-  .property 'filteredContent', 'optionGroupPath'
+  .property 'filteredContent.@each', 'optionGroupPath', 'labels.@each'
 
   hasNoResults: Ember.computed.empty 'filteredContent'
 
