@@ -49,7 +49,8 @@ Ember.Widgets.TextEditorComponent.extend Ember.Widgets.DomHelper, Ember.Widgets.
     for pillElement in pillElements
       pill = @_getPillFromElement(pillElement)
       return unless pill
-      $(pillElement).replaceWith(pill.render())
+      # $(pillElement).replaceWith(pill.render())
+      $(pillElement).attr("title", pill.get("name"))
       $(pillElement).text(pill.result())
 
   _getCurrentCaretContainer: (range) ->
@@ -60,7 +61,8 @@ Ember.Widgets.TextEditorComponent.extend Ember.Widgets.DomHelper, Ember.Widgets.
 
   updatePill: (pill) ->
     pillElement = @_getElementFromPill(pill)
-    $(pillElement).replaceWith(pill.render())
+    # $(pillElement).replaceWith(pill.render())
+    $(pillElement).attr("title", pill.get("name"))
     $(pillElement).text(pill.result())
 
   insertPill: (pill) ->
